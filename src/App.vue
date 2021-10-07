@@ -1,26 +1,41 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>Vee-Validateでフォームバリデーション</h1>
+
+    <input type="text" v-model="name" />
+    <p>{{ errors.name }}</p>
+
+    <input type="email" :value="email" @blur="handleChange" />
+    <p>{{ errors.email }}</p>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { useField, useForm } from "vee-validate";
+import { object, string } from "yup";
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
-</script>
+    setup() {
+        const schema = object({
+            name: string().required("必須の項目です。"),
+            email: string()
+                .required("必須の項目です。")
+                .email("メールアドレスの形式ではありません。"),
+        });
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+        const { errors } = useForm({
+            validationSchema: schema,
+        });
+
+        const { value: name } = useField("name");
+        const { value: email, handleChange } = useField("email");
+
+        console.log({ value: email, handleChange });
+
+        return {
+            name,
+            email,
+            errors,
+            handleChange,
+        };
+    },
+};
+</script>
